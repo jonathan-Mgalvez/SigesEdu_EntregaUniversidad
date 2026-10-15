@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "Auditoría y Cierre de Actas";
+}
+
+<div class="container mt-4">
+    <h2>Control Académico > Actas Oficiales > Auditoría y Cierre Definitivo</h2>
+    <hr />
+
+    @if (ViewBag.MensajeError != null)
+    {
+        <div class="alert alert-danger"><strong>Cierre Abortado:</strong> @ViewBag.MensajeError</div>
+    }
+    @if (ViewBag.MensajeExito != null)
+    {
+        <div class="alert alert-success"><strong>Éxito:</strong> @ViewBag.MensajeExito</div>
+    }
+
+    <div class="row mb-3">
+        <div class="col-md-3"><strong>Periodo:</strong> @(ViewBag.Header?.Periodo ?? "N/A")</div>
+        <div class="col-md-3"><strong>Curso:</strong> @(ViewBag.Header?.Curso ?? "N/A")</div>
+        <div class="col-md-3"><strong>Grado:</strong> @(ViewBag.Header?.Grado ?? "N/A")</div>
+        <div class="col-md-3"><strong>Sección:</strong> @(ViewBag.Header?.Seccion ?? "N/A")</div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-md-6"><strong>Docente Titular:</strong> <em>Asignado en Malla Curricular</em></div>
+        <div class="col-md-6">
+            <strong>Estado del Acta:</strong> 
+            @if (ViewBag.Header?.EsCerrada == true)
+            {
+                <span class="badge bg-danger">CERRADA / INMUTABLE</span>
+            }
+            else
+            {
+                <span class="badge bg-warning text-dark">ABIERTA / EN PROCESO (Editable)</span>
+            }
+        </div>
+    </div>
+
+    <!-- Cuadrícula de Calificaciones Simulada -->
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>No.</th>
+                <th>Carnet</th>
+                <th>Apellidos y Nombres</th>
+                <th>Zona (60)</th>
+                <th>Examen (40)</th>
+                <th>Total (100)</th>
+                <th>Condición</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (ViewBag.Calificaciones != null)
+            {
+                int index = 1;
+                foreach (var cal in ViewBag.Calificaciones)
+                {
+                    <tr>
+                        <td>@index.ToString("00")</td>
+                        <td>@cal.Carnet</td>
+                        <td>@cal.Nombres</td>
+                        <td>@cal.Zona</td>
+                        <td>@cal.Examen</td>
+                        <td><strong>@cal.Total</strong></td>
+                        <td class="@(cal.Condicion == "APROBADO" ? "text-success fw-bold" : "text-danger fw-bold")">@cal.Condicion</td>
+                    </tr>
+                    index++;
+                }
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between mb-4 text-muted">
+        <span><strong>Total Alumnos:</strong> @ViewBag.TotalAlumnos</span>
+        <span><strong>Calificados:</strong> @ViewBag.TotalAlumnos / @ViewBag.TotalAlumnos (100%)</span>
+        <span><strong>Promedio General:</strong> @ViewBag.Promedio pts</span>
+        <span><strong>Faltantes:</strong> 0</span>
+    </div>
+
+    @if (ViewBag.Header?.EsCerrada == true)
+    {
+        <div class="alert alert-info text-center">
+            <h5><i class="bi bi-shield-lock"></i> Acta Legalizada y Sellada</h5>
+            <p class="mb-0">Hash de seguridad SHA-256: <code>@ViewBag.Header.FirmaHash</code></p>
+        </div>
+    }
+    else
+    {
+        <form asp-controller="Coordinacion" asp-action="ProcesarCierre" method="post">
+        <input type="hidden" name="actaId" value="@ViewBag.ActaId" />
+        
+        <div class="card border-dark mb-3">
+            <div class="card-header bg-dark text-white">VALIDACIÓN PREVIA AL CIERRE:</div>
+            <div class="card-body">
+                <p class="text-success mb-1">✓ [OK] Todas las calificaciones parciales se encuentran asentadas.</p>
+                <p class="text-success mb-4">✓ [OK] Fecha actual se encuentra dentro del rango oficial de calendario.</p>
+
+                <div class="row align-items-center">
+                    <div class="col-md-5">
+                        <label class="form-label fw-bold">PIN de Seguridad del Coordinador:</label>
+                        <input type="password" name="pinSeguridad" class="form-control" placeholder="****" required maxlength="4" />
+                        <small class="text-muted">(Para pruebas, ingrese 1234)</small>
+                    </div>
+                    <div class="col-md-7 d-flex justify-content-end align-items-end mt-3 mt-md-0">
+                        <a href="@Url.Action("ExportarBorradorPdf", "Coordinacion", new { actaId = ViewBag.ActaId })" class="btn btn-secondary me-2" target="_blank">
+                            <i class="bi bi-file-earmark-pdf"></i> Exportar Borrador PDF
+                        </a>
+                        <button type="submit" class="btn btn-danger fw-bold">Ejecutar Cierre Inmutable de Acta (RN-05)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert alert-warning text-center">
+            <small>ADVERTENCIA: Al confirmar el cierre, los registros pasarán a solo lectura irreversible en SQLite y se generará la huella SHA-256.</small>
+        </div>
+    </form>
+    }
+
+</div>

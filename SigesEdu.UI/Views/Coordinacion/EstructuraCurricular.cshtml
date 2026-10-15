@@ -1,0 +1,186 @@
+@{
+    ViewData["Title"] = "Estructura Curricular y Cupos";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 style="color: #4E342E;">Configuración Curricular y Asignación Docente</h2>
+    </div>
+    <hr style="border-color: #8D6E63;" />
+
+    @if (TempData["MensajeError"] != null)
+    {
+        <div class="alert alert-danger">@TempData["MensajeError"]</div>
+    }
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">@TempData["MensajeExito"]</div>
+    }
+
+    <div class="row">
+        <!-- Columna Izquierda: Entradas (Formularios de Configuración) -->
+        <div class="col-md-5">
+            
+            <!-- Bloque 1: Apertura de Secciones y Cupos (RF-13) -->
+            <div class="card mb-4" style="border-color: #D7CCC8;">
+                <div class="card-header text-white" style="background-color: #6D4C41;">
+                    <i class="bi bi-diagram-3"></i> Apertura de Secciones y Cupos
+                </div>
+                <div class="card-body" style="background-color: #FDFBF7;">
+                    <form asp-controller="Coordinacion" asp-action="CrearSeccion" method="post">
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #5D4037;">Nivel y Grado</label>
+                            <select name="gradoId" class="form-select" required>
+                                <option value="">Seleccione un grado...</option>
+                                @if (ViewBag.Grados != null)
+                                {
+                                    foreach (var grado in ViewBag.Grados)
+                                    {
+                                        <option value="@grado.GradoId">@grado.Descripcion</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="color: #5D4037;">Nombre Sección</label>
+                                <input type="text" name="nombreSeccion" class="form-control" placeholder="Ej. A, B, Única" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label" style="color: #5D4037;">Capacidad (Cupos)</label>
+                                <input type="number" name="capacidad" class="form-control" value="30" min="10" max="50" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-sm w-100 fw-bold" style="color: #4E342E; border: 1px solid #4E342E; background-color: transparent;">
+                            <i class="bi bi-plus-circle"></i> Crear Sección
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bloque 2: Asignar Docente a Curso (RF-14) -->
+            <div class="card mb-4" style="border-color: #D7CCC8;">
+                <div class="card-header text-white" style="background-color: #6D4C41;">
+                    <i class="bi bi-person-video3"></i> Asignación de Carga Docente
+                </div>
+                <div class="card-body" style="background-color: #FDFBF7;">
+                    <form asp-controller="Coordinacion" asp-action="AsignarCarga" method="post">
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #5D4037;">Sección Destino</label>
+                            <select name="seccionId" class="form-select" required>
+                                <option value="">Seleccione una sección...</option>
+                                @if (ViewBag.Secciones != null)
+                                {
+                                    foreach (var sec in ViewBag.Secciones)
+                                    {
+                                        <option value="@sec.SeccionId">@sec.GradoYSeccion</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #5D4037;">Materia / Curso</label>
+                            <input type="text" name="nombreCurso" class="form-control" placeholder="Ej. Matemáticas" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" style="color: #5D4037;">Docente Titular</label>
+                            <select name="docenteId" class="form-select" required>
+                                <option value="">Seleccione un docente habilitado...</option>
+                                @if (ViewBag.Docentes != null)
+                                {
+                                    foreach (var doc in ViewBag.Docentes)
+                                    {
+                                        <option value="@doc.DocenteId">@doc.Nombre</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-sm w-100 fw-bold" style="color: #4E342E; border: 1px solid #4E342E; background-color: transparent;">
+                            <i class="bi bi-link-45deg"></i> Asignar Carga a Docente
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Salidas (Monitoreo de Cupos y Malla) -->
+        <div class="col-md-7">
+            <div class="card h-100" style="border-color: #D7CCC8;">
+                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #6D4C41;">
+                    <span><i class="bi bi-bar-chart-line"></i> Reporte de Ocupación y Alertas</span>
+                    <span class="badge bg-light text-dark">Ciclo Lectivo 2026</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover mb-0 text-center align-middle" style="font-size: 0.9rem;">
+                            <thead style="background-color: #EFEBE9; color: #4E342E;">
+                                <tr>
+                                    <th class="text-start">Grado y Sección</th>
+                                    <th>Ocupación (Matriculados)</th>
+                                    <th>Estado Cupos</th>
+                                    <th>Carga Docente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.Secciones != null)
+                                {
+                                    bool haySecciones = false;
+                                    foreach (var sec in ViewBag.Secciones)
+                                    {
+                                        haySecciones = true;
+                                        int ocupados = sec.Ocupados;
+                                        int capacidad = sec.Capacidad;
+                                        int porcentaje = capacidad > 0 ? (ocupados * 100) / capacidad : 0;
+                                        bool agotado = ocupados >= capacidad;
+
+                                        <tr>
+                                            <td class="text-start fw-bold" style="color: #5D4037;">@sec.GradoYSeccion</td>
+                                            <td>
+                                                @ocupados / @capacidad
+                                                <div class="progress mt-1" style="height: 5px;">
+                                                    <div class="progress-bar @(agotado ? "bg-danger" : "bg-success")" role="progressbar" style="width: @porcentaje%;"></div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (agotado)
+                                                {
+                                                    <span class="badge bg-danger">Agotado</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-success">Disponible (@(capacidad - ocupados))</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (sec.TotalMaterias > 0)
+                                                {
+                                                    <span>@sec.TotalMaterias materia(s) asignada(s)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-danger fw-bold">0 materias</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+
+                                    if (!haySecciones)
+                                    {
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted py-4">No hay secciones configuradas. Cree una sección en el panel izquierdo.</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer" style="background-color: #FDFBF7;">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i> Los reportes de estadísticas de rendimiento académico y actas de legalización se habilitarán automáticamente en el menú principal tras el <strong>Cierre de Actas</strong>.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

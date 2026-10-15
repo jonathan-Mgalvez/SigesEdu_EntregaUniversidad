@@ -1,0 +1,104 @@
+@{
+    ViewData["Title"] = "Boleta de Calificaciones";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 style="color: #4E342E;">Boleta Oficial de Calificaciones</h2>
+        <button class="btn btn-outline-secondary" onclick="window.print()">
+            <i class="bi bi-printer"></i> Imprimir Boleta
+        </button>
+    </div>
+    <hr style="border-color: #8D6E63;" />
+
+    <!-- Ficha del Estudiante -->
+    <div class="card mb-4" style="border-color: #D7CCC8;">
+        <div class="card-body" style="background-color: #FDFBF7;">
+            <div class="row">
+                <div class="row">
+                <div class="col-md-8">
+                    <h5 style="color: #6D4C41;" class="fw-bold">@ViewBag.Estudiante.NombreCompleto</h5>
+                    <p class="mb-1 text-dark"><strong>Carné:</strong> @ViewBag.Estudiante.Carnet</p>
+                    <p class="mb-1 text-dark"><strong>Nivel:</strong> @ViewBag.Estudiante.Nivel</p>
+                    <p class="mb-0 text-dark"><strong>Grado y Sección:</strong> @ViewBag.Estudiante.GradoYSeccion</p>
+                </div>
+                <div class="col-md-4 text-md-end border-start">
+                    <p class="mb-1 text-muted"><strong>Ciclo Lectivo:</strong> @DateTime.Now.Year</p>
+                    <p class="mb-0 text-muted"><strong>Promedio General:</strong> <span class="fs-5 fw-bold text-dark">@ViewBag.Promedio</span></p>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cuadro de Calificaciones -->
+    <div class="card mb-4" style="border-color: #D7CCC8;">
+        <div class="card-header text-white" style="background-color: #6D4C41;">
+            Rendimiento Académico
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #EFEBE9; color: #4E342E;">
+                        <tr>
+                            <th class="text-start">Asignatura</th>
+                            <th>Bimestre 1</th>
+                            <th>Bimestre 2</th>
+                            <th>Bimestre 3</th>
+                            <th>Bimestre 4</th>
+                            <th style="background-color: #D7CCC8;">Nota Final</th>
+                            <th>Condición</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Notas != null)
+                        {
+                            foreach (var nota in ViewBag.Notas)
+                            {
+                                <tr>
+                                    <td class="text-start fw-bold" style="color: #5D4037;">@nota.Asignatura</td>
+                                    <td>@nota.Bimestre1</td>
+                                    <td>@nota.Bimestre2</td>
+                                    <td>@nota.Bimestre3</td>
+                                    <td>@nota.Bimestre4</td>
+                                    <td class="fw-bold" style="background-color: #F5F5F5;">@nota.NotaFinal</td>
+                                    <td>
+                                        @if (nota.Condicion == "Aprobado")
+                                        {
+                                            <span class="badge bg-success">Aprobado</span>
+                                        }
+                                        else if (nota.Condicion == "En Riesgo")
+                                        {
+                                            <span class="badge bg-warning text-dark">En Riesgo</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">@nota.Condicion</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sello de Inmutabilidad (Visual) -->
+    <div class="alert" style="background-color: #EFEBE9; border: 1px dashed #8D6E63;">
+        <div class="d-flex align-items-center">
+            <div class="me-3">
+                <h2 class="mb-0 text-success"><i class="bi bi-shield-check"></i></h2>
+            </div>
+            <div>
+                <h6 class="mb-1" style="color: #4E342E;">Certificación de Integridad de Datos</h6>
+                <p class="mb-0 text-muted" style="font-size: 0.9rem;">
+                    Las notas mostradas correspondientes a periodos cerrados están selladas bajo el protocolo de inmutabilidad (Regla RN-05). 
+                    <strong>Firma Criptográfica (Bimestre 1):</strong> <code>A3F9B2...C812</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>

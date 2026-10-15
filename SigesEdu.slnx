@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="SigesEdu.Application/SigesEdu.Application.csproj" />
+  <Project Path="SigesEdu.Domain/SigesEdu.Domain.csproj" />
+  <Project Path="SigesEdu.Infrastructure/SigesEdu.Infrastructure.csproj" />
+  <Project Path="SigesEdu.Tests/SigesEdu.Tests.csproj" />
+  <Project Path="SigesEdu.UI/SigesEdu.UI.csproj" />
+</Solution>

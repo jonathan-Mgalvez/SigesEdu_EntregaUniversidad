@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header text-white text-center" style="background-color: #5D4037;">
+                <h4 class="mb-0">SigesEdu - Acceso</h4>
+            </div>
+            <div class="card-body">
+                <!-- Zona de mensajes de error -->
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger text-center">
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <!-- Formulario de Login -->
+                <form asp-controller="Auth" asp-action="Login" method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nombre de Usuario</label>
+                        <input type="text" class="form-control" id="username" name="username" required autocomplete="off" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="password" name="password" required />
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-lg text-white shadow-sm" style="background-color: #5D4037; border-color: #4E342E;">Ingresar al Sistema</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted text-center text-sm" style="background-color: #F4F1EA;">
+                <small>Cuentas: padre1 | tesoreria | coordinacion | docente1 | estudiante1 | admin<br/>Clave: 123456</small>
+            </div>
+        </div>
+    </div>
+</div>

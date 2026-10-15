@@ -1,0 +1,125 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var usuarioRol = HttpContextAccessor.HttpContext?.Session.GetString("UsuarioRol");
+    var username = HttpContextAccessor.HttpContext?.Session.GetString("Username");
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SigesEdu</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        /* Ajustes de color institucional para la barra de navegación */
+        .navbar-custom { background-color: #4E342E; }
+        .navbar-custom .navbar-brand, .navbar-custom .nav-link { color: #FDFBF7 !important; }
+        .navbar-custom .nav-link:hover { color: #D7CCC8 !important; }
+        .dropdown-item:hover { background-color: #EFEBE9; color: #4E342E; }
+    </style>
+</head>
+<body style="background-color: #FDFBF7;">
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark navbar-custom border-bottom box-shadow mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-building"></i> SigesEdu
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        
+                        @if (!string.IsNullOrEmpty(usuarioRol))
+                        {
+                            @* Menú exclusivo para Coordinador Académico *@
+                            if (usuarioRol == "Coordinador")
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-gear"></i> Gestión Académica
+                                    </a>
+                                    <ul class="dropdown-menu border-0 shadow">
+                                        <li><a class="dropdown-item" asp-controller="Coordinacion" asp-action="EstructuraCurricular">Estructura Curricular y Cupos</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-controller="Coordinacion" asp-action="CierreActa">Auditoría y Cierre de Actas</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            
+                            @* Menú exclusivo para Padre de Familia *@
+                            else if (usuarioRol == "Padre")
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Matricula" asp-action="Solicitud"><i class="bi bi-file-earmark-plus"></i> Nueva Matrícula</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-controller="Tesoreria" asp-action="EstadoCuenta"><i class="bi bi-wallet2"></i> Estado de Cuenta</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-controller="Academico" asp-action="BoletaNotas"><i class="bi bi-award"></i> Boleta de Notas</a></li>
+                            }
+
+                            @* Menú exclusivo para Docente *@
+                            else if (usuarioRol == "Docente")
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Docente" asp-action="IngresoNotas"><i class="bi bi-journal-text"></i> Evaluación Continua</a></li>
+                            }
+
+                            @* Menú exclusivo para Estudiante *@
+                            else if (usuarioRol == "Estudiante")
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Estudiante" asp-action="Dashboard"><i class="bi bi-house"></i> Mi Portal</a></li>
+                                <li class="nav-item"><a class="nav-link" asp-controller="Academico" asp-action="BoletaNotas"><i class="bi bi-award"></i> Mis Notas</a></li>
+                            }
+
+                            @* Menú exclusivo para Tesorero *@
+                            else if (usuarioRol == "Tesorero")
+                            {
+                                <li class="nav-item"><a class="nav-link" asp-controller="Tesoreria" asp-action="ValidacionPago"><i class="bi bi-cash-coin"></i> Bandeja de Pagos</a></li>
+                            }
+                        }
+                    </ul>
+                    
+                    @* Controles de Sesión a la derecha *@
+                    <ul class="navbar-nav">
+                        @if (!string.IsNullOrEmpty(usuarioRol))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle fw-bold" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @username (@usuarioRol)
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
+                                    <li><a class="dropdown-item text-danger fw-bold" asp-controller="Auth" asp-action="Logout"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-light btn-sm mt-1 fw-bold" style="color: #5D4037;" asp-controller="Auth" asp-action="Login">Iniciar Sesión</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-auto py-3" style="background-color: #EFEBE9;">
+        <div class="container text-center">
+            &copy; @DateTime.Now.Year - SigesEdu Institucional - Metodología RUP
+        </div>
+    </footer>
+    
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

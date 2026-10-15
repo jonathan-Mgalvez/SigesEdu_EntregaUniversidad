@@ -1,0 +1,172 @@
+@{
+    ViewData["Title"] = "Nueva Solicitud de Matrícula";
+}
+
+<div class="container mt-4">
+    <h2 style="color: #4E342E;">Paso 1: Datos del Estudiante y Carga de Legajo</h2>
+    <hr style="border-color: #8D6E63;" />
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+    @if (ViewBag.Mensaje != null)
+    {
+        <div class="alert alert-success">@ViewBag.Mensaje</div>
+    }
+
+    <form asp-controller="Matricula" asp-action="CargarLegajo" method="post" enctype="multipart/form-data">
+        
+        <!-- PASO 1: DATOS DEL ESTUDIANTE -->
+        <div class="card mb-4" style="border-color: #D7CCC8;">
+            <div class="card-header text-white" style="background-color: #6D4C41;">Paso 1: Datos Generales</div>
+            <div class="card-body" style="background-color: #FDFBF7;">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Documento de Identidad (CUI)</label>
+                        <input type="text" class="form-control" name="documentoIdentidad" required />
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Nombres</label>
+                        <input type="text" class="form-control" name="nombres" required />
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" name="apellidos" required />
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Fecha Nacimiento</label>
+                        <input type="date" class="form-control" name="fechaNacimiento" required />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 2: ASIGNACIÓN ACADÉMICA -->
+        <div class="card mb-4" style="border-color: #D7CCC8;">
+            <div class="card-header text-white" style="background-color: #6D4C41;">Paso 2: Asignación Académica</div>
+            <div class="card-body" style="background-color: #FDFBF7;">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Nivel Educativo</label>
+                        <select class="form-select" id="nivelEducativo" name="nivelEducativo" required>
+                            <option value="">Seleccione un nivel...</option>
+                            <option value="Preprimaria">Preprimaria</option>
+                            <option value="Primaria">Primaria</option>
+                            <option value="Basico">Básico</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Grado</label>
+                        <select class="form-select" id="gradoId" name="gradoId" required disabled>
+                            <option value="">Seleccione un grado...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label style="color: #5D4037;" class="form-label">Sección Solicitada</label>
+                        <select class="form-select" id="seccionId" name="seccionId" required disabled>
+                            <option value="">Seleccione una sección...</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASO 3: CARGA DE LEGAJO DIGITAL -->
+        <div class="card mb-4" style="border-color: #D7CCC8;">
+            <div class="card-header text-white" style="background-color: #6D4C41;">Paso 3: Carga de Legajo Digital (PDF/JPG, Max 5MB)</div>
+            <div class="card-body" style="background-color: #FDFBF7;">
+                <div class="mb-3">
+                    <label style="color: #5D4037;" class="form-label">Certificado de Nacimiento</label>
+                    <input type="file" class="form-control" name="certificadoNacimiento" accept=".pdf,.jpg,.jpeg" required />
+                </div>
+                <div class="mb-3">
+                    <label style="color: #5D4037;" class="form-label">Constancia de Estudios</label>
+                    <input type="file" class="form-control" name="constanciaEstudios" accept=".pdf,.jpg,.jpeg" required />
+                </div>
+                <div class="mb-3">
+                    <label style="color: #5D4037;" class="form-label">Solvencia Financiera</label>
+                    <input type="file" class="form-control" name="solvenciaFinanciera" accept=".pdf,.jpg,.jpeg" required />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-check mb-4">
+            <input class="form-check-input" type="checkbox" required id="declaracion" name="declaracion">
+            <label class="form-check-label" for="declaracion" style="color: #5D4037;">
+                Declaro bajo juramento que los documentos adjuntos son legítimos y fidedignos.
+            </label>
+        </div>
+
+        <button type="submit" class="btn text-white" style="background-color: #5D4037; border-color: #4E342E;">Enviar Solicitud a Revisión</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const nivelSelect = document.getElementById('nivelEducativo');
+            const gradoSelect = document.getElementById('gradoId');
+            const seccionSelect = document.getElementById('seccionId');
+
+            // 1. Al cambiar el Nivel Educativo -> Cargar Grados
+            nivelSelect.addEventListener('change', function () {
+                const nivel = this.value;
+                
+                // Reiniciar los selectores dependientes
+                gradoSelect.innerHTML = '<option value="">Seleccione un grado...</option>';
+                seccionSelect.innerHTML = '<option value="">Seleccione una sección...</option>';
+                gradoSelect.disabled = true;
+                seccionSelect.disabled = true;
+
+                if (nivel) {
+                    fetch(`/Matricula/ObtenerGradosPorNivel?nivel=${nivel}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(grado => {
+                                const option = document.createElement('option');
+                                option.value = grado.gradoId;
+                                option.textContent = grado.nombreGrado;
+                                gradoSelect.appendChild(option);
+                            });
+                            gradoSelect.disabled = false;
+                        })
+                        .catch(error => console.error('Error cargando grados:', error));
+                }
+            });
+
+            // 2. Al cambiar el Grado -> Cargar Secciones y disponibilidad
+            gradoSelect.addEventListener('change', function () {
+                const gradoId = this.value;
+                
+                // Reiniciar el selector de sección
+                seccionSelect.innerHTML = '<option value="">Seleccione una sección...</option>';
+                seccionSelect.disabled = true;
+
+                if (gradoId) {
+                    fetch(`/Matricula/ObtenerSeccionesPorGrado?gradoId=${gradoId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(seccion => {
+                                const cuposDisponibles = seccion.capacidadMaxima - seccion.cuposOcupados;
+                                const option = document.createElement('option');
+                                option.value = seccion.seccionId;
+                                option.textContent = `${seccion.nombreSeccion} (Cupos Disp: ${cuposDisponibles}/${seccion.capacidadMaxima})`;
+                                
+                                // Si no hay cupos, deshabilitar la opción visualmente
+                                if (cuposDisponibles <= 0) {
+                                    option.disabled = true;
+                                    option.textContent += " - LLENO";
+                                }
+                                
+                                seccionSelect.appendChild(option);
+                            });
+                            seccionSelect.disabled = false;
+                        })
+                        .catch(error => console.error('Error cargando secciones:', error));
+                }
+            });
+        });
+    </script>
+}

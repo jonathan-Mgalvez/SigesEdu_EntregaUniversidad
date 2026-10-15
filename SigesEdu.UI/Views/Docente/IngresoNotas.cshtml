@@ -1,0 +1,122 @@
+@{
+    ViewData["Title"] = "Ingreso de Notas y Asistencia";
+}
+
+<div class="container mt-4">
+    @if (TempData["MensajeExito"] != null)
+    {
+        <div class="alert alert-success">@TempData["MensajeExito"]</div>
+    }
+
+    <form asp-controller="Docente" asp-action="GuardarNotas" method="post" id="formNotasDocente">
+        <input type="hidden" name="cursoId" value="@ViewBag.CursoId" />
+        
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 style="color: #4E342E;">Panel del Docente - Evaluación Continua</h2>
+            <button type="submit" class="btn text-white" style="background-color: #5D4037; border-color: #4E342E;">
+                <i class="bi bi-save"></i> Guardar Cambios
+            </button>
+        </div>
+        <hr style="border-color: #8D6E63;" />
+
+    <!-- Información del Curso y Plazos de Apertura (RN-03) -->
+    <div class="card mb-4" style="border-color: #D7CCC8;">
+        <div class="card-body" style="background-color: #FDFBF7;">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <h5 style="color: #6D4C41;" class="fw-bold">@(ViewBag.Curso?.Nombre ?? "Curso no encontrado")</h5>
+                    <p class="mb-1 text-dark"><strong>Grado y Sección:</strong> @(ViewBag.Curso?.GradoSeccion ?? "N/A")</p>
+                    <p class="mb-0 text-muted"><strong>Periodo Activo:</strong> @(ViewBag.Curso?.Periodo ?? "N/A")</p>
+                </div>
+                <div class="col-md-5 text-md-end border-start">
+                    <!-- Alerta de Ventana Evaluativa -->
+                    <div class="alert alert-success py-2 mb-0 d-inline-block text-start">
+                        <h6 class="mb-1 fw-bold"><i class="bi bi-unlock-fill"></i> Ventana Evaluativa ABIERTA</h6>
+                        <small class="mb-0">Cierre programado: <strong>15/10/2026 23:59</strong></small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nómina de Estudiantes, Notas, Asistencia y Conducta -->
+    <div class="card mb-4" style="border-color: #D7CCC8;">
+        <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #6D4C41;">
+            <span>Nómina de Estudiantes (Matrícula Activa)</span>
+            <span class="badge bg-light text-dark">Total: 30 Alumnos</span>
+        </div>
+        <div class="card-body p-0">
+            <form id="formNotasDocente">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped mb-0 text-center align-middle" style="font-size: 0.9rem;">
+                        <thead style="background-color: #EFEBE9; color: #4E342E;">
+                            <tr>
+                                <th style="width: 5%;">No.</th>
+                                <th style="width: 10%;">Carné</th>
+                                <th class="text-start" style="width: 25%;">Apellidos y Nombres</th>
+                                <th style="width: 15%;">Asistencia de Hoy</th>
+                                <th style="width: 12%;">Zona (60pts)</th>
+                                <th style="width: 12%;">Examen (40pts)</th>
+                                <th style="width: 10%; background-color: #D7CCC8;">Total</th>
+                                <th style="width: 11%;">Conducta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Estudiantes != null)
+                            {
+                                int index = 1;
+                                foreach (var est in ViewBag.Estudiantes)
+                                {
+                                    <tr>
+                                        <td>@index</td>
+                                        <td>
+                                            @est.Carnet
+                                            <input type="hidden" name="estudianteIds" value="@est.EstudianteId" />
+                                        </td>
+                                        <td class="text-start fw-bold" style="color: #5D4037;">@est.Nombre</td>
+                                        <td>
+                                            <select name="asistencias" class="form-select form-select-sm border-success text-success">
+                                                <option value="P" selected>Presente</option>
+                                                <option value="A">Ausente</option>
+                                                <option value="T">Tardanza</option>
+                                                <option value="J">Justificado</option>
+                                            </select>
+                                        </td>
+                                        <td><input type="number" name="zonas" class="form-control form-control-sm text-center input-nota" value="@est.Zona" min="0" max="60" oninput="calcularTotal(this)"></td>
+                                        <td><input type="number" name="examenes" class="form-control form-control-sm text-center input-nota" value="@est.Examen" min="0" max="40" oninput="calcularTotal(this)"></td>
+                                        <td class="fw-bold row-total" style="background-color: #F5F5F5;">@(est.Zona + est.Examen)</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" title="Añadir Observación">
+                                                <i class="bi bi-chat-square-text"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    index++;
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer" style="background-color: #FDFBF7;">
+            <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted"><i class="bi bi-info-circle"></i> Los totales se calculan automáticamente. Asegúrese de guardar los cambios antes de salir.</small>
+                <button type="button" class="btn btn-outline-primary" style="color: #4E342E; border-color: #4E342E;">
+                    Generar Pre-Acta para Revisión
+                </button>
+            </div>
+        </div>
+    </div>
+    </form> <!-- Cierre del formulario maestro -->
+    </div>
+
+    <script>
+        function calcularTotal(element) {
+            let tr = element.closest('tr');
+            let zona = parseFloat(tr.querySelector('input[name="zonas"]').value) || 0;
+            let examen = parseFloat(tr.querySelector('input[name="examenes"]').value) || 0;
+            tr.querySelector('.row-total').innerText = (zona + examen);
+        }
+    </script>
+</div>

@@ -1,0 +1,151 @@
+@{
+    ViewData["Title"] = "Portal del Estudiante";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 style="color: #4E342E;">Portal del Estudiante</h2>
+        <!-- Botón que conecta con la vista de notas que ya hicimos -->
+        <a href="/Academico/BoletaNotas" class="btn text-white" style="background-color: #5D4037; border-color: #4E342E;">
+            <i class="bi bi-file-earmark-text"></i> Ver Boleta de Notas
+        </a>
+    </div>
+    <hr style="border-color: #8D6E63;" />
+
+    <!-- Información del Estudiante -->
+    <div class="card mb-4" style="border-color: #D7CCC8;">
+        <div class="card-body" style="background-color: #FDFBF7;">
+            <div class="row align-items-center">
+                <div class="col-md-10">
+                    <h5 style="color: #6D4C41;" class="fw-bold">@(ViewBag.Estudiante?.NombreCompleto ?? "Estudiante no encontrado en la base de datos")</h5>
+                    <p class="mb-1 text-dark">
+                        <strong>Carné:</strong> @(ViewBag.Estudiante?.Carnet ?? "N/A") &nbsp;|&nbsp; 
+                        <strong>Grado Actual:</strong> @(ViewBag.Estudiante?.GradoYSeccion)
+                    </p>
+                    <p class="mb-0 text-muted">Docente Titular: <em>Asignado en Malla Curricular</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Panel de Tareas y Observaciones -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-color: #D7CCC8;">
+                <div class="card-header text-white" style="background-color: #6D4C41;">
+                    Tareas Pendientes y Observaciones
+                </div>
+                <div class="card-body p-0" style="background-color: #FDFBF7;">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" style="background-color: transparent;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" style="color: #5D4037;">Examen Corto - Matemáticas</h6>
+                                <small class="text-danger fw-bold">Mañana</small>
+                            </div>
+                            <p class="mb-1 text-muted" style="font-size: 0.9rem;">Estudiar fracciones y decimales (Capítulo 4 del libro).</p>
+                        </li>
+                        <li class="list-group-item" style="background-color: transparent;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1" style="color: #5D4037;">Maqueta - Ciencias Naturales</h6>
+                                <small class="text-muted">Viernes 16/10</small>
+                            </div>
+                            <p class="mb-1 text-muted" style="font-size: 0.9rem;">Presentar maqueta del sistema solar con materiales reciclables.</p>
+                        </li>
+                        <!-- Ejemplo de Observación Conductual -->
+                        <li class="list-group-item" style="background-color: transparent; border-left: 4px solid #ffc107;">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 text-dark">Observación Conductual</h6>
+                                <small class="text-muted">05/10/2026</small>
+                            </div>
+                            <p class="mb-1 text-muted" style="font-size: 0.9rem;">El alumno no trajo el material completo para la clase de Artes Plásticas.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Horario de Clases -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100" style="border-color: #D7CCC8;">
+                <div class="card-header text-white" style="background-color: #6D4C41;">
+                    Horario de Clases
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0 text-center" style="font-size: 0.85rem;">
+                            <thead style="background-color: #EFEBE9; color: #4E342E;">
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted align-middle">07:30 - 08:15</td>
+                                    <td>Matemáticas</td>
+                                    <td>Comunicación</td>
+                                    <td>C. Naturales</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted align-middle">08:15 - 09:00</td>
+                                    <td>Matemáticas</td>
+                                    <td>Comunicación</td>
+                                    <td>Ed. Física</td>
+                                </tr>
+                                <tr style="background-color: #F5F5F5;">
+                                    <td colspan="4" class="text-muted fw-bold py-2">R E C R E O</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted align-middle">09:30 - 10:15</td>
+                                    <td>E. Sociales</td>
+                                    <td>Inglés</td>
+                                    <td>Artes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial Escolar -->
+    <div class="card mb-4" style="border-color: #D7CCC8;">
+        <div class="card-header text-white" style="background-color: #6D4C41;">
+            Historial Escolar (Años Anteriores)
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped mb-0 text-center align-middle">
+                    <thead style="background-color: #EFEBE9; color: #4E342E;">
+                        <tr>
+                            <th>Ciclo Escolar</th>
+                            <th>Grado Cursado</th>
+                            <th>Promedio Final</th>
+                            <th>Resultado Académico</th>
+                            <th>Certificado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025</td>
+                            <td>3ero Primaria</td>
+                            <td class="fw-bold">85.00</td>
+                            <td><span class="badge bg-success">Promovido</span></td>
+                            <td><button class="btn btn-sm btn-outline-secondary">Descargar PDF</button></td>
+                        </tr>
+                        <tr>
+                            <td>2024</td>
+                            <td>2do Primaria</td>
+                            <td class="fw-bold">88.50</td>
+                            <td><span class="badge bg-success">Promovido</span></td>
+                            <td><button class="btn btn-sm btn-outline-secondary">Descargar PDF</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
